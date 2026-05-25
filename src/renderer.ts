@@ -42,7 +42,7 @@ export function renderSvg(
 
   // SVG root with CSS variables + style block + defs
   parts.push(svgOpenTag(graph.width, graph.height, colors, transparent))
-  parts.push(buildStyleBlock(font, false))
+  parts.push(buildStyleBlock(font))
   parts.push('<defs>')
   parts.push(arrowMarkerDefs())
   // Per-color arrow markers for edges with custom stroke via linkStyle

@@ -149,6 +149,8 @@ export interface RenderOptions {
 
   /** Font family for all text. Default: 'Inter' */
   font?: string
+  /** Monospace font family for code-like text. Default: 'JetBrains Mono' */
+  monoFont?: string
   /** Canvas padding in px. Default: 40 */
   padding?: number
   /** Horizontal spacing between sibling nodes. Default: 24 */

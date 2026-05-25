@@ -63,7 +63,7 @@ describe('svgOpenTag', () => {
 
 describe('buildStyleBlock', () => {
   it('includes derived CSS variable declarations', () => {
-    const style = buildStyleBlock('Inter', false)
+    const style = buildStyleBlock('Inter')
     expect(style).toContain('--_text')
     expect(style).toContain('--_line')
     expect(style).toContain('--_arrow')
@@ -72,12 +72,63 @@ describe('buildStyleBlock', () => {
   })
 
   it('includes mono font class when requested', () => {
-    const withMono = buildStyleBlock('Inter', true)
+    const withMono = buildStyleBlock('Inter', 'JetBrains Mono')
     expect(withMono).toContain('.mono')
     expect(withMono).toContain('JetBrains Mono')
 
-    const withoutMono = buildStyleBlock('Inter', false)
+    const withoutMono = buildStyleBlock('Inter')
     expect(withoutMono).not.toContain('.mono')
+  })
+
+  it('omits Google Fonts @import when font is a CSS variable', () => {
+    const style = buildStyleBlock('var(--font-family-body)')
+    expect(style).not.toContain('fonts.googleapis.com')
+    expect(style).not.toContain('Inter')
+  })
+
+  it('omits all @imports when CSS variable font and no mono', () => {
+    const style = buildStyleBlock('var(--my-font)')
+    expect(style).not.toContain('@import')
+  })
+
+  it('includes mono @import when CSS variable font has literal mono', () => {
+    const style = buildStyleBlock('var(--my-font)', 'JetBrains Mono')
+    expect(style).toContain('JetBrains Mono')
+    expect(style).not.toContain('Inter')
+  })
+
+  it('omits mono @import when mono font is a CSS variable', () => {
+    const style = buildStyleBlock('Inter', 'var(--mono-font)')
+    expect(style).toContain('Inter')
+    expect(style).not.toContain('JetBrains+Mono')
+  })
+
+  it('omits all @imports when both fonts are CSS variables', () => {
+    const style = buildStyleBlock('var(--body-font)', 'var(--mono-font)')
+    expect(style).not.toContain('@import')
+  })
+
+  it('renders CSS variable mono font unquoted in .mono class', () => {
+    const style = buildStyleBlock('Inter', 'var(--mono-font)')
+    expect(style).toContain('.mono')
+    expect(style).toContain("font-family: var(--mono-font), 'SF Mono'")
+    expect(style).not.toContain("'var(--mono-font)'")
+  })
+
+  it('renders literal mono font quoted in .mono class', () => {
+    const style = buildStyleBlock('Inter', 'JetBrains Mono')
+    expect(style).toContain("font-family: 'JetBrains Mono', 'SF Mono'")
+  })
+
+  it('renders CSS variable font unquoted in font-family', () => {
+    const style = buildStyleBlock('var(--font-body)')
+    expect(style).toContain("font-family: var(--font-body), system-ui, sans-serif")
+    expect(style).not.toContain("'var(--font-body)'")
+  })
+
+  it('renders regular font quoted in font-family', () => {
+    const style = buildStyleBlock('Inter')
+    expect(style).toContain("font-family: 'Inter', system-ui, sans-serif")
   })
 })
 

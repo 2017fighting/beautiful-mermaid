@@ -61,6 +61,8 @@ export const DEFAULTS: Readonly<{ bg: string; fg: string }> = {
 // coherent mono hierarchy on any bg/fg combination.
 // ============================================================================
 
+export const DEFAULT_MONO_FONT = 'JetBrains Mono'
+
 export const MIX = {
   /** Primary text: near-full fg */
   text:         100, // just use --fg directly
@@ -235,12 +237,13 @@ export function fromShikiTheme(theme: ShikiThemeLike): DiagramColors {
  * a parent element, it's used directly. When unset, the fallback computes
  * a blended value from --fg and --bg using color-mix().
  */
-export function buildStyleBlock(font: string, hasMonoFont: boolean): string {
+export function buildStyleBlock(font: string, monoFont?: string): string {
+  const isCssVar = font.startsWith('var(')
+  const isMonoCssVar = monoFont?.startsWith('var(') ?? false
+
   const fontImports = [
-    `@import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@400;500;600;700&amp;display=swap');`,
-    ...(hasMonoFont
-      ? [`@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;display=swap');`]
-      : []),
+    ...(isCssVar ? [] : [`@import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(font)}:wght@400;500;600;700&amp;display=swap');`]),
+    ...(monoFont && !isMonoCssVar ? [`@import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(monoFont)}:wght@400;500&amp;display=swap');`] : []),
   ]
 
   // Derived CSS variables: use override if set, else mix from bg+fg.
@@ -263,8 +266,8 @@ export function buildStyleBlock(font: string, hasMonoFont: boolean): string {
   return [
     '<style>',
     `  ${fontImports.join('\n  ')}`,
-    `  text { font-family: '${font}', system-ui, sans-serif; }`,
-    ...(hasMonoFont ? [`  .mono { font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', ui-monospace, monospace; }`] : []),
+    `  text { font-family: ${isCssVar ? font : `'${font}'`}, system-ui, sans-serif; }`,
+    ...(monoFont ? [`  .mono { font-family: ${isMonoCssVar ? monoFont : `'${monoFont}'`}, 'SF Mono', 'Fira Code', ui-monospace, monospace; }`] : []),
     `  svg {${derivedVars}`,
     `  }`,
     '</style>',

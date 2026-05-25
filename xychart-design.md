@@ -316,7 +316,7 @@ export function renderXYChartSvg(
 **SVG structure and render order:**
 
 1. `svgOpenTag()` — sets CSS variables on the root `<svg>` element
-2. `buildStyleBlock(font, false)` — no mono font needed for charts
+2. `buildStyleBlock(font)` — no mono font needed for charts
 3. Additional `<style>` rules for chart-specific elements:
    - `.xychart-bar { fill: var(--_accent); }` (or series-indexed colors)
    - `.xychart-line { stroke: var(--_accent); fill: none; stroke-width: 2; }`

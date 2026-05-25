@@ -70,7 +70,7 @@ export function renderXYChartSvg(
   const svgTag = svgOpenTag(chart.width, chart.height, colors, transparent)
     .replace('<svg ', `<svg data-xychart-colors="${maxColorIdx}" `)
   parts.push(svgTag)
-  parts.push(buildStyleBlock(font, false))
+  parts.push(buildStyleBlock(font))
 
   // Sparse lines (≤12 points) show dots by default
   const maxLinePoints = Math.max(...chart.lines.map(l => l.points.length), 0)
